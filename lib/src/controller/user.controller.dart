@@ -1,6 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 // Método para realizar o cadastro
 Future<void> signUp(String email, String password) async {
   try {

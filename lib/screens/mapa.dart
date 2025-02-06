@@ -5,6 +5,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:async';
 
+import 'package:uuid/uuid.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+
 class MapaScreen extends StatefulWidget {
   const MapaScreen({super.key});
 
@@ -15,17 +18,15 @@ class MapaScreen extends StatefulWidget {
 class _MapaScreenState extends State<MapaScreen> {
   GoogleMapController? mapController;
   final LatLng ifpi = const LatLng(-5.08921, -42.8016);
-  LatLng currentPosition = const LatLng(-5.08922, -42.8016);
+  LatLng currentPosition = const LatLng(-5.089308, -42.811028);
   bool isLoading = false;
   String? errorMessage;
 
-  // Lista de marcadores
+  // marcadores e polyline
   final Set<Marker> _marcadores = {};
-
-  // Lista de contatos
   List<dynamic> contatos = [];
+  final Set<Polyline> _polylines = {};
 
-  // Instancia do controller de contatos
   ContatosController contatosController =
       ContatosController(Supabase.instance.client);
 
@@ -36,11 +37,10 @@ class _MapaScreenState extends State<MapaScreen> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
     initContatos();
   }
 
-  // criando os marcadores dos contatos
+  // Realiza as marcações dos contatos
   void initContatos() async {
     final listaContatos = await contatosController.listarContatos();
     contatos = listaContatos;
@@ -51,21 +51,15 @@ class _MapaScreenState extends State<MapaScreen> {
       final nome = listaContatos[i]['nome_contato'];
       final descricao = listaContatos[i]['contato_descricao'];
 
-      // Aguarde a criação dos marcadores
       final markers = await createCustomMarker(
-          location, nome, descricao, "marker-blue.png");
-      _marcadores.addAll(markers); // Adiciona os marcadores ao conjunto
+          context, location, nome, descricao, "marker-blue.png");
+      setState(() {
+        _marcadores.addAll(markers);
+      });
     }
-    setState(() {});
-
-    // Aguarde a criação do marcador atual
-    final currentMarker = await createCustomMarker(
-        currentPosition, "Você", "Você está aqui", "you.png");
-    _marcadores.addAll(currentMarker);
-    setState(() {});
   }
 
-  // Método para obter a localização atual
+  // Capta a posição atual do usuário
   Future<void> _getCurrentLocation() async {
     setState(() {
       isLoading = true;
@@ -74,27 +68,98 @@ class _MapaScreenState extends State<MapaScreen> {
 
     try {
       final location = await localizacaoAtual();
+      print("você está aqui: $location");
+
       setState(() {
         currentPosition = location;
-        // Limpa os marcadores antigos
-        _marcadores.clear();
       });
 
-      // Aguarde a criação do marcador atual
       final currentMarker = await createCustomMarker(
-          currentPosition, "Você", "Você está aqui", "you.png");
+          context, currentPosition, "Você", "Você está aqui", "you.png");
+
       setState(() {
-        _marcadores.addAll(currentMarker); // Adiciona o marcador atual
+        _marcadores.addAll(currentMarker);
       });
+
+      // atualiza a visão para o usuário
+      mapController?.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: location,
+          zoom: 15,
+        ),
+      ));
     } catch (e) {
       setState(() {
         errorMessage = "Erro ao obter localização: $e";
       });
     } finally {
       setState(() {
-        isLoading = false; // Atualiza o estado de loading
+        isLoading = false;
       });
     }
+  }
+
+  void addPolylineToMap(Polyline polyline) {
+    setState(() {
+      _polylines.add(polyline);
+    });
+  }
+
+  Future<BitmapDescriptor> addCustomIcon(String customIcon) async {
+    return await BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(48, 48)), customIcon);
+  }
+
+// Função para criar um marcador personalizado
+  Future<Set<Marker>> createCustomMarker(BuildContext context, LatLng location,
+      String titleMarker, String snippet, String iconPath) async {
+    final String id = const Uuid().v4();
+    BitmapDescriptor customIcon = await addCustomIcon(iconPath);
+
+    return {
+      Marker(
+        markerId: MarkerId(id),
+        position: location,
+        icon: customIcon,
+        onTap: () {
+          showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (builder) {
+                return Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(),
+                      SizedBox(height: 16.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              titleMarker,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          SizedBox(width: 8.0),
+                          buttonRota(location),
+                        ],
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        snippet,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              });
+        },
+      ),
+    };
   }
 
   @override
@@ -109,7 +174,6 @@ class _MapaScreenState extends State<MapaScreen> {
       ),
       body: Column(
         children: [
-          // if (isLoading) const LinearProgressIndicator(),
           if (errorMessage != null)
             Container(
               color: Colors.red.withAlpha((0.1 * 255).round()),
@@ -122,15 +186,22 @@ class _MapaScreenState extends State<MapaScreen> {
             ),
           Expanded(
             child: GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: ifpi,
-                  zoom: 11,
-                ),
-                onMapCreated: _onMapCreated,
-                myLocationEnabled: true,
-                markers: _marcadores.map((e) => e).toSet()),
+              initialCameraPosition: CameraPosition(
+                target: ifpi,
+                zoom: 11,
+              ),
+              onMapCreated: _onMapCreated,
+              myLocationEnabled: true,
+              markers: _marcadores,
+              polylines: _polylines,
+            ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _getCurrentLocation,
+        child: const Icon(Icons.my_location),
+        backgroundColor: Colors.amber,
       ),
     );
   }

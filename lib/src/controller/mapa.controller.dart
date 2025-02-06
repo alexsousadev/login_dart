@@ -5,6 +5,22 @@ import 'package:flutter/material.dart';
 
 // Retorna a localização atual do dispositivo
 Future<LatLng> localizacaoAtual() async {
+  // checando se o serviço de localização está ativo
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+  if (!serviceEnabled) {
+    throw Exception('Serviço de localização desabilitado');
+  }
+
+  // checando permissão para o maps
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      throw Exception('Permisão negada');
+    }
+  }
+
   Position position = await Geolocator.getCurrentPosition(
     locationSettings: const LocationSettings(
       accuracy: LocationAccuracy.high,
@@ -38,10 +54,9 @@ Future<BitmapDescriptor> addCustomIcon(String customIcon) async {
 }
 
 // Função para criar um marcador personalizado
-createCustomMarker(LatLng location, String titleMarker, String snippet,
-    String iconPath) async {
+Future<Set<Marker>> createCustomMarker(BuildContext context, LatLng location,
+    String titleMarker, String snippet, String iconPath) async {
   final String id = const Uuid().v4();
-
   BitmapDescriptor customIcon = await addCustomIcon(iconPath);
 
   return {
@@ -49,10 +64,56 @@ createCustomMarker(LatLng location, String titleMarker, String snippet,
       markerId: MarkerId(id),
       position: location,
       icon: customIcon,
-      infoWindow: InfoWindow(
-        title: titleMarker,
-        snippet: snippet,
-      ),
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (builder) {
+            return Container(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          titleMarker,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      SizedBox(width: 8.0),
+                      buttonRota(location),
+                    ],
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    snippet,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     ),
   };
+}
+
+// botão para traçar a rota
+Align buttonRota(LatLng location) {
+  return Align(
+    alignment: Alignment.centerRight,
+    child: IconButton(
+      icon: Icon(Icons.directions),
+      iconSize: 35,
+      onPressed: () {},
+    ),
+  );
 }
