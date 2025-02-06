@@ -22,4 +22,5 @@ Para configurar sua chave de API, siga os passos abaixo:
    ```env
    API_KEY=sua_chave_aqui
    SUPABASE_URL=sua_url_aqui
+   MAPS_KEY= sua_chave_aqui
    ```

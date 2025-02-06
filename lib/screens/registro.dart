@@ -130,7 +130,7 @@ class CadastroScreen extends StatelessWidget {
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4),
-                      side: BorderSide(width: 5, color: Colors.black),
+                      side: const BorderSide(width: 5, color: Colors.black),
                     ),
                   ),
                   child: const Text(

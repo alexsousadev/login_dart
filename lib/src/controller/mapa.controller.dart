@@ -32,7 +32,7 @@ Future<LatLng> localizacaoAtual() async {
 }
 
 // Função para criar um marcador comum
-Set<Marker> createMarker(LatLng location, String title_marker, String snippet) {
+Set<Marker> createMarker(LatLng location, String titleMarker, String snippet) {
   final String id = const Uuid().v4();
 
   return {
@@ -40,7 +40,7 @@ Set<Marker> createMarker(LatLng location, String title_marker, String snippet) {
       markerId: MarkerId(id),
       position: location,
       infoWindow: InfoWindow(
-        title: title_marker,
+        title: titleMarker,
         snippet: snippet,
       ),
     ),
@@ -70,12 +70,12 @@ Future<Set<Marker>> createCustomMarker(BuildContext context, LatLng location,
           isScrollControlled: true,
           builder: (builder) {
             return Container(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -83,15 +83,15 @@ Future<Set<Marker>> createCustomMarker(BuildContext context, LatLng location,
                         child: Text(
                           titleMarker,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      SizedBox(width: 8.0),
+                      const SizedBox(width: 8.0),
                       buttonRota(location),
                     ],
                   ),
-                  SizedBox(height: 8.0),
+                  const SizedBox(height: 8.0),
                   Text(
                     snippet,
                     textAlign: TextAlign.center,
@@ -111,7 +111,7 @@ Align buttonRota(LatLng location) {
   return Align(
     alignment: Alignment.centerRight,
     child: IconButton(
-      icon: Icon(Icons.directions),
+      icon: const Icon(Icons.directions),
       iconSize: 35,
       onPressed: () {},
     ),

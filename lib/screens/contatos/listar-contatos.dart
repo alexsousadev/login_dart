@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/screens/contatos/registrar-contato.dart';
 import 'package:flutter_application_1/src/controller/contatos.controller.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -10,7 +11,6 @@ class ListaContatosScreen extends StatefulWidget {
 }
 
 class ListaContatosScreenState extends State<ListaContatosScreen> {
-
   // trazendo a lista de contatos
   List<dynamic> contatos = [];
   bool isLoading = true;
@@ -62,13 +62,18 @@ class ListaContatosScreenState extends State<ListaContatosScreen> {
               onPressed: () {
                 // Implementar navegação para tela de cadastro
                 print('Cadastrar novo contato');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const RegistrarContatoScreen()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero),
               ),
               child: const Text(
                 'Cadastrar Contato',
@@ -152,7 +157,7 @@ class ContatoWidget extends StatelessWidget {
             icon: const Icon(Icons.delete, color: Colors.red),
             onPressed: onDelete,
           ),
-          SizedBox(
+          const SizedBox(
             height: 30,
           ),
         ],

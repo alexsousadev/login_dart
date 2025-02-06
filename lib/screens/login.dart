@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderSide:
                         BorderSide(width: borderValue, color: Colors.blue),
                   ),
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderSide:
                         BorderSide(width: borderValue, color: Colors.blue),
                   ),
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
                   ),
@@ -129,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4),
-                      side: BorderSide(width: 5, color: Colors.black),
+                      side: const BorderSide(width: 5, color: Colors.black),
                     ),
                   ),
                   child: const Text(

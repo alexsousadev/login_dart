@@ -6,7 +6,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:async';
 
 import 'package:uuid/uuid.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class MapaScreen extends StatefulWidget {
   const MapaScreen({super.key});
@@ -127,12 +126,12 @@ class _MapaScreenState extends State<MapaScreen> {
               isScrollControlled: true,
               builder: (builder) {
                 return Container(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -140,15 +139,15 @@ class _MapaScreenState extends State<MapaScreen> {
                             child: Text(
                               titleMarker,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           ),
-                          SizedBox(width: 8.0),
+                          const SizedBox(width: 8.0),
                           buttonRota(location),
                         ],
                       ),
-                      SizedBox(height: 8.0),
+                      const SizedBox(height: 8.0),
                       Text(
                         snippet,
                         textAlign: TextAlign.center,
@@ -200,8 +199,8 @@ class _MapaScreenState extends State<MapaScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _getCurrentLocation,
-        child: const Icon(Icons.my_location),
         backgroundColor: Colors.amber,
+        child: const Icon(Icons.my_location),
       ),
     );
   }
